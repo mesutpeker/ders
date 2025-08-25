@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edebiyat Dersi Dağıtım Uygulaması</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+
+        .stats {
+            background: #ecf0f1;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            border-bottom: 2px solid #bdc3c7;
+        }
+
+        .stat-item {
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        .table-container {
+            padding: 15px;
+            overflow-x: auto;
+        }
+
+        .teachers-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        .teachers-table th {
+            background: #34495e;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 1em;
+            border: 1px solid #2c3e50;
+        }
+
+        .teachers-table td {
+            padding: 10px 8px;
+            border: 1px solid #ddd;
+            vertical-align: top;
+            width: 14.28%; /* 7 eşit sütun */
+        }
+
+        .teacher-column {
+            background: #fafafa;
+            text-align: center;
+        }
+
+        .total-hours {
+            background: #27ae60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+        }
+
+        .class-select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+
+        .class-select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .assigned-class {
+            background: white;
+            margin-bottom: 5px;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.9em;
+        }
+
+        .class-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .class-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .class-hours {
+            background: #34495e;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 15px;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+        }
+
+        .empty-message {
+            color: #95a5a6;
+            font-style: italic;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.85em;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .connected {
+            background: #27ae60;
+            color: white;
+        }
+
+        .disconnected {
+            background: #e74c3c;
+            color: white;
+        }
+
+        @media (max-width: 1200px) {
+            .teachers-table {
+                min-width: 800px;
+            }
+            
+            .teachers-table th {
+                font-size: 0.9em;
+                padding: 10px 5px;
+            }
+            
+            .teachers-table td {
+                padding: 8px 5px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .stat-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="connectionStatus" class="connection-status disconnected">Bağlanıyor...</div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Edebiyat Dersi Dağıtım Sistemi</h1>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div>
+                    <div class="stat-number" id="totalClasses">31</div>
+                    <div class="stat-label">Toplam Sınıf</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div>
+                    <div class="stat-number" id="assignedClasses">0</div>
+                    <div class="stat-label">Atanan Sınıf</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div>
+                    <div class="stat-number" id="remainingClasses">31</div>
+                    <div class="stat-label">Kalan Sınıf</div>
+                </div>
+            </div>
+            <div class="stat-item">
+                <div>
+                    <div class="stat-number" id="totalHours">0</div>
+                    <div class="stat-label">Toplam Saat</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="teachers-table">
+                <thead>
+                    <tr>
+                        <th>Mesut</th>
+                        <th>Emre</th>
+                        <th>Ali</th>
+                        <th>Canip</th>
+                        <th>Havva</th>
+                        <th>Ayşenur</th>
+                        <th>Yeni Gelen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="teacher-column">
+                            <div class="total-hours" id="totalHours_Mesut">0 saat</div>
+                            <select class="class-select" id="classSelect_Mesut" onchange="onClassSelect('Mesut')">
+                                <option value="">Sınıf seçin...</option>
+                            </select>
+                            <div id="classes_Mesut" class="classes-container">
+                                <div class="empty-message">Sınıf yok</div>
+                            </div>
+                        </td>
+                        <td class="teacher-column">
+                            <div class="total-hours" id="totalHours_Emre">0 saat</div>
+                            <select class="class-select" id="classSelect_Emre" onchange="onClassSelect('Emre')">
+                                <option value="">Sınıf seçin...</option>
+                            </select>
+                            <div id="classes_Emre" class="classes-container">
+                                <div class="empty-message">Sınıf yok</div>
+                            </div>
+                        </td>
+                        <td class="teacher-column">
+                            <div class="total-hours" id="totalHours_Ali">0 saat</div>
+                            <select class="class-select" id="classSelect_Ali" onchange="onClassSelect('Ali')">
+                                <option value="">Sınıf seçin...</option>
+                            </select>
+                            <div id="classes_Ali" class="classes-container">
+                                <div class="empty-message">Sınıf yok</div>
+                            </div>
+                        </td>
+                        <td class="teacher-column">
+                            <div class="total-hours" id="totalHours_Canip">0 saat</div>
+                            <select class="class-select" id="classSelect_Canip" onchange="onClassSelect('Canip')">
+                                <option value="">Sınıf seçin...</option>
+                            </select>
+                            <div id="classes_Canip" class="classes-container">
+                                <div class="empty-message">Sınıf yok</div>
+                            </div>
+                        </td>
+                        <td class="teacher-column">
+                            <div class="total-hours" id="totalHours_Havva">0 saat</div>
+                            <select class="class-select" id="classSelect_Havva" onchange="onClassSelect('Havva')">
+                                <option value="">Sınıf seçin...</option>
+                            </select>
+                            <div id="classes_Havva" class="classes-container">
+                                <div class="empty-message">Sınıf yok</div>
+                            </div>
+                        </td>
+                        <td class="teacher-column">
+                            <div class="total-hours" id="totalHours_Ayşenur">0 saat</div>
+                            <select class="class-select" id="classSelect_Ayşenur" onchange="onClassSelect('Ayşenur')">
+                                <option value="">Sınıf seçin...</option>
+                            </select>
+                            <div id="classes_Ayşenur" class="classes-container">
+                                <div class="empty-message">Sınıf yok</div>
+                            </div>
+                        </td>
+                        <td class="teacher-column">
+                            <div class="total-hours" id="totalHours_Yeni Gelen">0 saat</div>
+                            <select class="class-select" id="classSelect_Yeni Gelen" onchange="onClassSelect('Yeni Gelen')">
+                                <option value="">Sınıf seçin...</option>
+                            </select>
+                            <div id="classes_Yeni Gelen" class="classes-container">
+                                <div class="empty-message">Sınıf yok</div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="text-align: center;">
+            <button class="clear-btn" onclick="clearAll()">Tümünü Temizle</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCZPZ6nFlYroyN6oC2HRieIHXOu4Ny__EI",
+            authDomain: "ders-7af82.firebaseapp.com",
+            databaseURL: "https://ders-7af82-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "ders-7af82",
+            storageBucket: "ders-7af82.firebasestorage.app",
+            messagingSenderId: "866927019541",
+            appId: "1:866927019541:web:918f319e7a5286c8d5301c"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Veri yapıları
+        const classes = [
+            // MESEM sınıfları (2 saat)
+            { name: "9MSMA", hours: 2, grade: 9, type: "MESEM" },
+            { name: "9MSMB", hours: 2, grade: 9, type: "MESEM" },
+            { name: "10MSMA", hours: 2, grade: 10, type: "MESEM" },
+            { name: "10MSMB", hours: 2, grade: 10, type: "MESEM" },
+            { name: "11MSMA", hours: 2, grade: 11, type: "MESEM" },
+            { name: "11MSMB", hours: 2, grade: 11, type: "MESEM" },
+            { name: "12MSMA", hours: 2, grade: 12, type: "MESEM" },
+            { name: "12MSMB", hours: 2, grade: 12, type: "MESEM" },
+            
+            // 10. sınıf diğer şubeler (4 saat)
+            { name: "10A", hours: 4, grade: 10, type: "Normal" },
+            { name: "10B", hours: 4, grade: 10, type: "Normal" },
+            { name: "10D", hours: 4, grade: 10, type: "Normal" },
+            { name: "10E", hours: 4, grade: 10, type: "Normal" },
+            { name: "10L", hours: 4, grade: 10, type: "Normal" },
+            
+            // 9. sınıf diğer şubeler (5 saat)
+            { name: "9A", hours: 5, grade: 9, type: "Normal" },
+            { name: "9B", hours: 5, grade: 9, type: "Normal" },
+            { name: "9C", hours: 5, grade: 9, type: "Normal" },
+            { name: "9D", hours: 5, grade: 9, type: "Normal" },
+            { name: "9E", hours: 5, grade: 9, type: "Normal" },
+            { name: "9G", hours: 5, grade: 9, type: "Normal" },
+            { name: "9I", hours: 5, grade: 9, type: "Normal" },
+            { name: "9L", hours: 5, grade: 9, type: "Normal" },
+            
+            // 11. sınıf diğer şubeler (5 saat)
+            { name: "11A", hours: 5, grade: 11, type: "Normal" },
+            { name: "11C", hours: 5, grade: 11, type: "Normal" },
+            { name: "11D", hours: 5, grade: 11, type: "Normal" },
+            { name: "11L", hours: 5, grade: 11, type: "Normal" },
+            
+            // 12. sınıf diğer şubeler (5 saat)
+            { name: "12A", hours: 5, grade: 12, type: "Normal" },
+            { name: "12B", hours: 5, grade: 12, type: "Normal" },
+            { name: "12C", hours: 5, grade: 12, type: "Normal" },
+            { name: "12D", hours: 5, grade: 12, type: "Normal" },
+            { name: "12E", hours: 5, grade: 12, type: "Normal" },
+            { name: "12L", hours: 5, grade: 12, type: "Normal" }
+        ];
+
+        const teachers = ['Mesut', 'Emre', 'Ali', 'Canip', 'Havva', 'Ayşenur', 'Yeni Gelen'];
+        let teacherAssignments = {};
+        let assignedClasses = new Set();
+        let isUpdatingFromFirebase = false;
+
+        // Öğretmen atamalarını başlat
+        teachers.forEach(teacher => {
+            teacherAssignments[teacher] = [];
+        });
+
+        // Firebase bağlantı durumu
+        function updateConnectionStatus(connected) {
+            const statusElement = document.getElementById('connectionStatus');
+            if (connected) {
+                statusElement.textContent = 'Bağlı';
+                statusElement.className = 'connection-status connected';
+            } else {
+                statusElement.textContent = 'Bağlantı Kesildi';
+                statusElement.className = 'connection-status disconnected';
+            }
+        }
+
+        // Firebase'den veri yükle
+        function loadDataFromFirebase() {
+            const assignmentsRef = ref(database, 'assignments');
+            onValue(assignmentsRef, (snapshot) => {
+                updateConnectionStatus(true);
+                const data = snapshot.val();
+                
+                if (data && !isUpdatingFromFirebase) {
+                    isUpdatingFromFirebase = true;
+                    
+                    // Mevcut UI'yi temizle
+                    teachers.forEach(teacher => {
+                        teacherAssignments[teacher] = [];
+                        const classesContainer = document.getElementById(`classes_${teacher}`);
+                        classesContainer.innerHTML = '<div class="empty-message">Sınıf yok</div>';
+                    });
+                    assignedClasses.clear();
+
+                    // Firebase'den gelen veriyi yükle
+                    Object.keys(data).forEach(teacher => {
+                        if (data[teacher] && Array.isArray(data[teacher])) {
+                            data[teacher].forEach(assignment => {
+                                teacherAssignments[teacher].push(assignment);
+                                assignedClasses.add(assignment.className);
+                                addClassToTeacherUI(teacher, assignment.className, assignment.hours);
+                            });
+                            updateTeacherTotalHours(teacher);
+                        }
+                    });
+
+                    updateAllSelects();
+                    updateStats();
+                    
+                    isUpdatingFromFirebase = false;
+                }
+            }, (error) => {
+                console.error('Firebase okuma hatası:', error);
+                updateConnectionStatus(false);
+            });
+        }
+
+        // Firebase'e veri kaydet
+        function saveToFirebase() {
+            if (isUpdatingFromFirebase) return;
+            
+            const assignmentsRef = ref(database, 'assignments');
+            set(assignmentsRef, teacherAssignments).catch((error) => {
+                console.error('Firebase yazma hatası:', error);
+                updateConnectionStatus(false);
+            });
+        }
+
+        // Sayfa yüklendiğinde
+        window.addEventListener('load', function() {
+            updateAllSelects();
+            updateStats();
+            loadDataFromFirebase();
+        });
+
+        // Sınıf seçeneklerini oluştur
+        function createClassOptions() {
+            const availableClasses = classes.filter(cls => !assignedClasses.has(cls.name));
+            const sortedClasses = availableClasses.sort((a, b) => {
+                if (a.grade !== b.grade) return a.grade - b.grade;
+                return a.name.localeCompare(b.name);
+            });
+
+            let options = '<option value="">Sınıf seçin...</option>';
+            sortedClasses.forEach(cls => {
+                options += `<option value="${cls.name}">${cls.name} (${cls.hours}s)</option>`;
+            });
+            
+            return options;
+        }
+
+        // Sınıf seçildiğinde
+        window.onClassSelect = function(teacher) {
+            const select = document.getElementById(`classSelect_${teacher}`);
+            const selectedClass = select.value;
+
+            if (selectedClass) {
+                const classInfo = classes.find(cls => cls.name === selectedClass);
+                
+                // Atamayı kaydet
+                teacherAssignments[teacher].push({
+                    className: selectedClass,
+                    hours: classInfo.hours
+                });
+                assignedClasses.add(selectedClass);
+
+                // UI'yi güncelle
+                addClassToTeacherUI(teacher, selectedClass, classInfo.hours);
+                updateTeacherTotalHours(teacher);
+                updateAllSelects();
+                updateStats();
+
+                // Seçimi sıfırla
+                select.value = '';
+
+                // Firebase'e kaydet
+                saveToFirebase();
+
+                console.log(`${selectedClass} sınıfı ${teacher} öğretmenine atandı.`);
+            }
+        }
+
+        // Öğretmene sınıf ekle (UI)
+        function addClassToTeacherUI(teacher, className, hours) {
+            const classesContainer = document.getElementById(`classes_${teacher}`);
+            
+            // İlk sınıf ekleniyorsa boş mesajı kaldır
+            const emptyMessage = classesContainer.querySelector('.empty-message');
+            if (emptyMessage) {
+                emptyMessage.remove();
+            }
+
+            // Yeni sınıf elementi oluştur
+            const classElement = document.createElement('div');
+            classElement.className = 'assigned-class';
+            classElement.id = `class_${teacher}_${className}`;
+            
+            classElement.innerHTML = `
+                <div class="class-info">
+                    <span class="class-name">${className}</span>
+                    <span class="class-hours">${hours}s</span>
+                </div>
+                <button class="remove-btn" onclick="removeClass('${teacher}', '${className}')" title="Sil">×</button>
+            `;
+            
+            classesContainer.appendChild(classElement);
+        }
+
+        // Tüm select'leri güncelle
+        function updateAllSelects() {
+            const options = createClassOptions();
+            teachers.forEach(teacher => {
+                const select = document.getElementById(`classSelect_${teacher}`);
+                const currentValue = select.value;
+                select.innerHTML = options;
+                
+                // Eğer önceki seçim hala mevcutsa, onu koru
+                if (currentValue && !assignedClasses.has(currentValue)) {
+                    select.value = currentValue;
+                }
+            });
+        }
+
+        // Sınıf kaldır
+        window.removeClass = function(teacher, className) {
+            // Veri yapısından kaldır
+            teacherAssignments[teacher] = teacherAssignments[teacher].filter(
+                assignment => assignment.className !== className
+            );
+            assignedClasses.delete(className);
+
+            // DOM'dan kaldır
+            const classElement = document.getElementById(`class_${teacher}_${className}`);
+            if (classElement) {
+                classElement.remove();
+            }
+
+            // Güncelle
+            updateAllSelects();
+            updateTeacherTotalHours(teacher);
+            updateStats();
+
+            // Eğer hiç sınıf kalmadıysa boş mesaj göster
+            const classesContainer = document.getElementById(`classes_${teacher}`);
+            if (classesContainer.children.length === 0) {
+                classesContainer.innerHTML = '<div class="empty-message">Sınıf yok</div>';
+            }
+
+            // Firebase'e kaydet
+            saveToFirebase();
+
+            console.log(`${className} sınıfı ${teacher} öğretmeninden kaldırıldı.`);
+        }
+
+        // Öğretmenin toplam saatini güncelle
+        function updateTeacherTotalHours(teacher) {
+            const totalHours = teacherAssignments[teacher].reduce((sum, assignment) => sum + assignment.hours, 0);
+            document.getElementById(`totalHours_${teacher}`).textContent = `${totalHours} saat`;
+        }
+
+        // İstatistikleri güncelle
+        function updateStats() {
+            const totalClasses = classes.length;
+            const assignedCount = assignedClasses.size;
+            const remainingCount = totalClasses - assignedCount;
+            const totalHours = Object.values(teacherAssignments)
+                .flat()
+                .reduce((sum, assignment) => sum + assignment.hours, 0);
+
+            document.getElementById('totalClasses').textContent = totalClasses;
+            document.getElementById('assignedClasses').textContent = assignedCount;
+            document.getElementById('remainingClasses').textContent = remainingCount;
+            document.getElementById('totalHours').textContent = totalHours;
+        }
+
+        // Tümünü temizle
+        window.clearAll = function() {
+            const hasAssignments = Object.values(teacherAssignments).some(assignments => assignments.length > 0);
+            
+            if (!hasAssignments) {
+                alert('Zaten hiç atama yok!');
+                return;
+            }
+
+            if (confirm('Tüm atamaları silmek istediğinizden emin misiniz?')) {
+                // Tüm atamaları temizle
+                teachers.forEach(teacher => {
+                    teacherAssignments[teacher] = [];
+                    
+                    // Sınıf containerını temizle
+                    const classesContainer = document.getElementById(`classes_${teacher}`);
+                    classesContainer.innerHTML = '<div class="empty-message">Sınıf yok</div>';
+                    
+                    // Toplam saati sıfırla
+                    document.getElementById(`totalHours_${teacher}`).textContent = '0 saat';
+                });
+                
+                assignedClasses.clear();
+                updateAllSelects();
+                updateStats();
+
+                // Firebase'e kaydet
+                saveToFirebase();
+                
+                alert('Tüm atamalar temizlendi!');
+            }
+        }
+    </script>
+</body>
+</html>
+
