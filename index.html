@@ -5,24 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edebiyat Dersi Dağıtım Uygulaması</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             background-color: #f5f5f5;
+            line-height: 1.4;
         }
 
         .container {
             max-width: 100%;
             margin: 0 auto;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
         .header {
-            background: #2c3e50;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
             color: white;
             padding: 20px;
             text-align: center;
@@ -30,20 +35,25 @@
 
         .header h1 {
             margin: 0;
-            font-size: 1.8em;
+            font-size: 1.5em;
+            font-weight: 600;
         }
 
         .stats {
             background: #ecf0f1;
             padding: 15px;
-            display: flex;
-            justify-content: space-around;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
             text-align: center;
             border-bottom: 2px solid #bdc3c7;
         }
 
         .stat-item {
-            flex: 1;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .stat-number {
@@ -53,8 +63,9 @@
         }
 
         .stat-label {
-            font-size: 0.9em;
+            font-size: 0.8em;
             color: #7f8c8d;
+            margin-top: 5px;
         }
 
         .table-container {
@@ -62,74 +73,123 @@
             overflow-x: auto;
         }
 
-        .teachers-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 1000px;
+        .teachers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
         }
 
-        .teachers-table th {
+        .teacher-card {
+            background: #fafafa;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .teacher-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .teacher-name {
             background: #34495e;
             color: white;
-            padding: 12px 8px;
-            text-align: center;
-            font-size: 1em;
-            border: 1px solid #2c3e50;
-        }
-
-        .teachers-table td {
-            padding: 10px 8px;
-            border: 1px solid #ddd;
-            vertical-align: top;
-            width: 14.28%; /* 7 eşit sütun */
-        }
-
-        .teacher-column {
-            background: #fafafa;
-            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 15px;
         }
 
         .total-hours {
             background: #27ae60;
             color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
+            padding: 8px 12px;
+            border-radius: 20px;
             font-weight: bold;
             display: inline-block;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-size: 0.9em;
         }
 
         .class-select {
             width: 100%;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            font-size: 0.85em;
+            padding: 12px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
             margin-bottom: 10px;
+            background: white;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
         }
 
         .class-select:focus {
             outline: none;
             border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .save-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .save-btn:hover {
+            background: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        .save-btn:active {
+            transform: translateY(0);
+        }
+
+        .save-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .assigned-class {
             background: white;
-            margin-bottom: 5px;
-            padding: 8px;
-            border-radius: 4px;
+            margin-bottom: 8px;
+            padding: 12px;
+            border-radius: 8px;
             border: 1px solid #ddd;
             display: flex;
             align-items: center;
             justify-content: space-between;
             font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .assigned-class:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .class-info {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .class-name {
@@ -140,8 +200,8 @@
         .class-hours {
             background: #34495e;
             color: white;
-            padding: 2px 6px;
-            border-radius: 10px;
+            padding: 4px 8px;
+            border-radius: 12px;
             font-size: 0.8em;
             font-weight: bold;
         }
@@ -150,51 +210,64 @@
             background: #e74c3c;
             color: white;
             border: none;
-            border-radius: 3px;
-            width: 20px;
-            height: 20px;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
             cursor: pointer;
-            font-size: 0.8em;
+            font-size: 1em;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
         }
 
         .remove-btn:hover {
             background: #c0392b;
+            transform: scale(1.1);
         }
 
         .clear-btn {
             background: #e74c3c;
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
+            padding: 15px 30px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 1em;
-            margin: 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .clear-btn:hover {
             background: #c0392b;
+            transform: translateY(-2px);
         }
 
         .empty-message {
             color: #95a5a6;
             font-style: italic;
             text-align: center;
-            padding: 10px;
-            font-size: 0.85em;
+            padding: 20px;
+            font-size: 0.9em;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 10px 0;
         }
 
         .connection-status {
             position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            border-radius: 5px;
+            top: 15px;
+            right: 15px;
+            padding: 8px 12px;
+            border-radius: 20px;
             font-size: 0.8em;
             font-weight: bold;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
 
         .connected {
@@ -207,35 +280,127 @@
             color: white;
         }
 
-        @media (max-width: 1200px) {
-            .teachers-table {
-                min-width: 800px;
+        .pending-changes {
+            background: #f39c12;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            margin-left: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Mobil optimizasyonlar */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
             }
-            
-            .teachers-table th {
+
+            .header h1 {
+                font-size: 1.3em;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .stat-number {
+                font-size: 1.3em;
+            }
+
+            .stat-label {
+                font-size: 0.75em;
+            }
+
+            .table-container {
+                padding: 10px;
+            }
+
+            .teachers-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .teacher-card {
+                padding: 12px;
+            }
+
+            .teacher-name {
+                font-size: 1em;
+                padding: 8px;
+            }
+
+            .class-select {
+                padding: 10px;
+                font-size: 16px; /* iOS zoom önleme */
+            }
+
+            .save-btn {
+                padding: 10px 16px;
                 font-size: 0.9em;
-                padding: 10px 5px;
             }
-            
-            .teachers-table td {
-                padding: 8px 5px;
+
+            .assigned-class {
+                padding: 10px;
+                font-size: 0.85em;
+            }
+
+            .connection-status {
+                top: 10px;
+                right: 10px;
+                font-size: 0.75em;
+                padding: 6px 10px;
             }
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
+        @media (max-width: 480px) {
             .stats {
-                flex-direction: column;
-                gap: 10px;
+                grid-template-columns: 1fr;
             }
-            
+
             .stat-item {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
+                padding: 8px;
+            }
+
+            .teacher-name {
+                font-size: 0.95em;
+            }
+
+            .class-select {
+                font-size: 16px; /* iOS zoom önleme */
+            }
+        }
+
+        /* iOS Safari için özel düzenlemeler */
+        @supports (-webkit-touch-callout: none) {
+            .class-select {
+                font-size: 16px !important; /* iOS zoom önleme */
+            }
+        }
+
+        /* Android için özel düzenlemeler */
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            .class-select {
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            }
+        }
+
+        /* Touch-friendly butonlar */
+        @media (pointer: coarse) {
+            .save-btn, .remove-btn, .clear-btn {
+                min-height: 44px; /* Apple'ın önerdiği minimum dokunma alanı */
+            }
+
+            .class-select {
+                min-height: 44px;
             }
         }
     </style>
@@ -245,122 +410,138 @@
     
     <div class="container">
         <div class="header">
-            <h1>Edebiyat Dersi Dağıtım Sistemi</h1>
+            <h1>📚 Edebiyat Dersi Dağıtım Sistemi</h1>
         </div>
 
         <div class="stats">
             <div class="stat-item">
-                <div>
-                    <div class="stat-number" id="totalClasses">31</div>
-                    <div class="stat-label">Toplam Sınıf</div>
-                </div>
+                <div class="stat-number" id="totalClasses">31</div>
+                <div class="stat-label">Toplam Sınıf</div>
             </div>
             <div class="stat-item">
-                <div>
-                    <div class="stat-number" id="assignedClasses">0</div>
-                    <div class="stat-label">Atanan Sınıf</div>
-                </div>
+                <div class="stat-number" id="assignedClasses">0</div>
+                <div class="stat-label">Atanan Sınıf</div>
             </div>
             <div class="stat-item">
-                <div>
-                    <div class="stat-number" id="remainingClasses">31</div>
-                    <div class="stat-label">Kalan Sınıf</div>
-                </div>
+                <div class="stat-number" id="remainingClasses">31</div>
+                <div class="stat-label">Kalan Sınıf</div>
             </div>
             <div class="stat-item">
-                <div>
-                    <div class="stat-number" id="totalHours">0</div>
-                    <div class="stat-label">Toplam Saat</div>
-                </div>
+                <div class="stat-number" id="totalHours">0</div>
+                <div class="stat-label">Toplam Saat</div>
             </div>
         </div>
 
         <div class="table-container">
-            <table class="teachers-table">
-                <thead>
-                    <tr>
-                        <th>Mesut</th>
-                        <th>Emre</th>
-                        <th>Ali</th>
-                        <th>Canip</th>
-                        <th>Havva</th>
-                        <th>Ayşenur</th>
-                        <th>Yeni Gelen</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="teacher-column">
-                            <div class="total-hours" id="totalHours_Mesut">0 saat</div>
-                            <select class="class-select" id="classSelect_Mesut" onchange="onClassSelect('Mesut')">
-                                <option value="">Sınıf seçin...</option>
-                            </select>
-                            <div id="classes_Mesut" class="classes-container">
-                                <div class="empty-message">Sınıf yok</div>
-                            </div>
-                        </td>
-                        <td class="teacher-column">
-                            <div class="total-hours" id="totalHours_Emre">0 saat</div>
-                            <select class="class-select" id="classSelect_Emre" onchange="onClassSelect('Emre')">
-                                <option value="">Sınıf seçin...</option>
-                            </select>
-                            <div id="classes_Emre" class="classes-container">
-                                <div class="empty-message">Sınıf yok</div>
-                            </div>
-                        </td>
-                        <td class="teacher-column">
-                            <div class="total-hours" id="totalHours_Ali">0 saat</div>
-                            <select class="class-select" id="classSelect_Ali" onchange="onClassSelect('Ali')">
-                                <option value="">Sınıf seçin...</option>
-                            </select>
-                            <div id="classes_Ali" class="classes-container">
-                                <div class="empty-message">Sınıf yok</div>
-                            </div>
-                        </td>
-                        <td class="teacher-column">
-                            <div class="total-hours" id="totalHours_Canip">0 saat</div>
-                            <select class="class-select" id="classSelect_Canip" onchange="onClassSelect('Canip')">
-                                <option value="">Sınıf seçin...</option>
-                            </select>
-                            <div id="classes_Canip" class="classes-container">
-                                <div class="empty-message">Sınıf yok</div>
-                            </div>
-                        </td>
-                        <td class="teacher-column">
-                            <div class="total-hours" id="totalHours_Havva">0 saat</div>
-                            <select class="class-select" id="classSelect_Havva" onchange="onClassSelect('Havva')">
-                                <option value="">Sınıf seçin...</option>
-                            </select>
-                            <div id="classes_Havva" class="classes-container">
-                                <div class="empty-message">Sınıf yok</div>
-                            </div>
-                        </td>
-                        <td class="teacher-column">
-                            <div class="total-hours" id="totalHours_Ayşenur">0 saat</div>
-                            <select class="class-select" id="classSelect_Ayşenur" onchange="onClassSelect('Ayşenur')">
-                                <option value="">Sınıf seçin...</option>
-                            </select>
-                            <div id="classes_Ayşenur" class="classes-container">
-                                <div class="empty-message">Sınıf yok</div>
-                            </div>
-                        </td>
-                        <td class="teacher-column">
-                            <div class="total-hours" id="totalHours_Yeni Gelen">0 saat</div>
-                            <select class="class-select" id="classSelect_Yeni Gelen" onchange="onClassSelect('Yeni Gelen')">
-                                <option value="">Sınıf seçin...</option>
-                            </select>
-                            <div id="classes_Yeni Gelen" class="classes-container">
-                                <div class="empty-message">Sınıf yok</div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="teachers-grid">
+                <div class="teacher-card">
+                    <div class="teacher-name">👨‍🏫 Mesut</div>
+                    <div class="total-hours" id="totalHours_Mesut">0 saat</div>
+                    <select class="class-select" id="classSelect_Mesut">
+                        <option value="">Sınıf seçin...</option>
+                    </select>
+                    <button class="save-btn" id="saveBtn_Mesut" onclick="saveTeacherAssignment('Mesut')" disabled>
+                        💾 Kaydet
+                        <span id="pendingChanges_Mesut" class="pending-changes" style="display: none;">●</span>
+                    </button>
+                    <div id="classes_Mesut" class="classes-container">
+                        <div class="empty-message">Henüz sınıf atanmamış</div>
+                    </div>
+                </div>
+
+                <div class="teacher-card">
+                    <div class="teacher-name">👨‍🏫 Emre</div>
+                    <div class="total-hours" id="totalHours_Emre">0 saat</div>
+                    <select class="class-select" id="classSelect_Emre">
+                        <option value="">Sınıf seçin...</option>
+                    </select>
+                    <button class="save-btn" id="saveBtn_Emre" onclick="saveTeacherAssignment('Emre')" disabled>
+                        💾 Kaydet
+                        <span id="pendingChanges_Emre" class="pending-changes" style="display: none;">●</span>
+                    </button>
+                    <div id="classes_Emre" class="classes-container">
+                        <div class="empty-message">Henüz sınıf atanmamış</div>
+                    </div>
+                </div>
+
+                <div class="teacher-card">
+                    <div class="teacher-name">👨‍🏫 Ali</div>
+                    <div class="total-hours" id="totalHours_Ali">0 saat</div>
+                    <select class="class-select" id="classSelect_Ali">
+                        <option value="">Sınıf seçin...</option>
+                    </select>
+                    <button class="save-btn" id="saveBtn_Ali" onclick="saveTeacherAssignment('Ali')" disabled>
+                        💾 Kaydet
+                        <span id="pendingChanges_Ali" class="pending-changes" style="display: none;">●</span>
+                    </button>
+                    <div id="classes_Ali" class="classes-container">
+                        <div class="empty-message">Henüz sınıf atanmamış</div>
+                    </div>
+                </div>
+
+                <div class="teacher-card">
+                    <div class="teacher-name">👨‍🏫 Canip</div>
+                    <div class="total-hours" id="totalHours_Canip">0 saat</div>
+                    <select class="class-select" id="classSelect_Canip">
+                        <option value="">Sınıf seçin...</option>
+                    </select>
+                    <button class="save-btn" id="saveBtn_Canip" onclick="saveTeacherAssignment('Canip')" disabled>
+                        💾 Kaydet
+                        <span id="pendingChanges_Canip" class="pending-changes" style="display: none;">●</span>
+                    </button>
+                    <div id="classes_Canip" class="classes-container">
+                        <div class="empty-message">Henüz sınıf atanmamış</div>
+                    </div>
+                </div>
+
+                <div class="teacher-card">
+                    <div class="teacher-name">👩‍🏫 Havva</div>
+                    <div class="total-hours" id="totalHours_Havva">0 saat</div>
+                    <select class="class-select" id="classSelect_Havva">
+                        <option value="">Sınıf seçin...</option>
+                    </select>
+                    <button class="save-btn" id="saveBtn_Havva" onclick="saveTeacherAssignment('Havva')" disabled>
+                        💾 Kaydet
+                        <span id="pendingChanges_Havva" class="pending-changes" style="display: none;">●</span>
+                    </button>
+                    <div id="classes_Havva" class="classes-container">
+                        <div class="empty-message">Henüz sınıf atanmamış</div>
+                    </div>
+                </div>
+
+                <div class="teacher-card">
+                    <div class="teacher-name">👩‍🏫 Ayşenur</div>
+                    <div class="total-hours" id="totalHours_Ayşenur">0 saat</div>
+                    <select class="class-select" id="classSelect_Ayşenur">
+                        <option value="">Sınıf seçin...</option>
+                    </select>
+                    <button class="save-btn" id="saveBtn_Ayşenur" onclick="saveTeacherAssignment('Ayşenur')" disabled>
+                        💾 Kaydet
+                        <span id="pendingChanges_Ayşenur" class="pending-changes" style="display: none;">●</span>
+                    </button>
+                    <div id="classes_Ayşenur" class="classes-container">
+                        <div class="empty-message">Henüz sınıf atanmamış</div>
+                    </div>
+                </div>
+
+                <div class="teacher-card">
+                    <div class="teacher-name">👩‍🏫 Yeni Gelen</div>
+                    <div class="total-hours" id="totalHours_Yeni Gelen">0 saat</div>
+                    <select class="class-select" id="classSelect_Yeni Gelen">
+                        <option value="">Sınıf seçin...</option>
+                    </select>
+                    <button class="save-btn" id="saveBtn_Yeni Gelen" onclick="saveTeacherAssignment('Yeni Gelen')" disabled>
+                        💾 Kaydet
+                        <span id="pendingChanges_Yeni Gelen" class="pending-changes" style="display: none;">●</span>
+                    </button>
+                    <div id="classes_Yeni Gelen" class="classes-container">
+                        <div class="empty-message">Henüz sınıf atanmamış</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div style="text-align: center;">
-            <button class="clear-btn" onclick="clearAll()">Tümünü Temizle</button>
-        </div>
+        <button class="clear-btn" onclick="clearAll()">🗑️ Tümünü Temizle</button>
     </div>
 
     <script type="module">
@@ -430,21 +611,23 @@
         const teachers = ['Mesut', 'Emre', 'Ali', 'Canip', 'Havva', 'Ayşenur', 'Yeni Gelen'];
         let teacherAssignments = {};
         let assignedClasses = new Set();
+        let pendingChanges = {};
         let isUpdatingFromFirebase = false;
 
         // Öğretmen atamalarını başlat
         teachers.forEach(teacher => {
             teacherAssignments[teacher] = [];
+            pendingChanges[teacher] = [];
         });
 
         // Firebase bağlantı durumu
         function updateConnectionStatus(connected) {
             const statusElement = document.getElementById('connectionStatus');
             if (connected) {
-                statusElement.textContent = 'Bağlı';
+                statusElement.textContent = '🟢 Bağlı';
                 statusElement.className = 'connection-status connected';
             } else {
-                statusElement.textContent = 'Bağlantı Kesildi';
+                statusElement.textContent = '🔴 Bağlantı Kesildi';
                 statusElement.className = 'connection-status disconnected';
             }
         }
@@ -463,7 +646,7 @@
                     teachers.forEach(teacher => {
                         teacherAssignments[teacher] = [];
                         const classesContainer = document.getElementById(`classes_${teacher}`);
-                        classesContainer.innerHTML = '<div class="empty-message">Sınıf yok</div>';
+                        classesContainer.innerHTML = '<div class="empty-message">Henüz sınıf atanmamış</div>';
                     });
                     assignedClasses.clear();
 
@@ -490,6 +673,60 @@
             });
         }
 
+        // Sınıf seçim değişikliği
+        function onClassSelectChange(teacher) {
+            const select = document.getElementById(`classSelect_${teacher}`);
+            const selectedClass = select.value;
+            const saveBtn = document.getElementById(`saveBtn_${teacher}`);
+            const pendingIndicator = document.getElementById(`pendingChanges_${teacher}`);
+
+            if (selectedClass) {
+                // Pending changes'e ekle
+                const classInfo = classes.find(cls => cls.name === selectedClass);
+                pendingChanges[teacher].push({
+                    className: selectedClass,
+                    hours: classInfo.hours
+                });
+
+                // UI'yi güncelle
+                saveBtn.disabled = false;
+                pendingIndicator.style.display = 'inline';
+                
+                // Seçimi sıfırla
+                select.value = '';
+            }
+        }
+
+        // Öğretmen atamasını kaydet
+        window.saveTeacherAssignment = function(teacher) {
+            if (pendingChanges[teacher].length === 0) return;
+
+            // Pending changes'i asıl atamaya ekle
+            pendingChanges[teacher].forEach(assignment => {
+                teacherAssignments[teacher].push(assignment);
+                assignedClasses.add(assignment.className);
+                addClassToTeacherUI(teacher, assignment.className, assignment.hours);
+            });
+
+            // Pending changes'i temizle
+            pendingChanges[teacher] = [];
+            
+            // UI'yi güncelle
+            const saveBtn = document.getElementById(`saveBtn_${teacher}`);
+            const pendingIndicator = document.getElementById(`pendingChanges_${teacher}`);
+            saveBtn.disabled = true;
+            pendingIndicator.style.display = 'none';
+
+            updateTeacherTotalHours(teacher);
+            updateAllSelects();
+            updateStats();
+
+            // Firebase'e kaydet
+            saveToFirebase();
+
+            console.log(`${teacher} öğretmeninin atamaları kaydedildi.`);
+        }
+
         // Firebase'e veri kaydet
         function saveToFirebase() {
             if (isUpdatingFromFirebase) return;
@@ -506,6 +743,12 @@
             updateAllSelects();
             updateStats();
             loadDataFromFirebase();
+
+            // Sınıf seçim event listener'ları ekle
+            teachers.forEach(teacher => {
+                const select = document.getElementById(`classSelect_${teacher}`);
+                select.addEventListener('change', () => onClassSelectChange(teacher));
+            });
         });
 
         // Sınıf seçeneklerini oluştur
@@ -518,41 +761,10 @@
 
             let options = '<option value="">Sınıf seçin...</option>';
             sortedClasses.forEach(cls => {
-                options += `<option value="${cls.name}">${cls.name} (${cls.hours}s)</option>`;
+                options += `<option value="${cls.name}">${cls.name} (${cls.hours} saat)</option>`;
             });
             
             return options;
-        }
-
-        // Sınıf seçildiğinde
-        window.onClassSelect = function(teacher) {
-            const select = document.getElementById(`classSelect_${teacher}`);
-            const selectedClass = select.value;
-
-            if (selectedClass) {
-                const classInfo = classes.find(cls => cls.name === selectedClass);
-                
-                // Atamayı kaydet
-                teacherAssignments[teacher].push({
-                    className: selectedClass,
-                    hours: classInfo.hours
-                });
-                assignedClasses.add(selectedClass);
-
-                // UI'yi güncelle
-                addClassToTeacherUI(teacher, selectedClass, classInfo.hours);
-                updateTeacherTotalHours(teacher);
-                updateAllSelects();
-                updateStats();
-
-                // Seçimi sıfırla
-                select.value = '';
-
-                // Firebase'e kaydet
-                saveToFirebase();
-
-                console.log(`${selectedClass} sınıfı ${teacher} öğretmenine atandı.`);
-            }
         }
 
         // Öğretmene sınıf ekle (UI)
@@ -618,7 +830,7 @@
             // Eğer hiç sınıf kalmadıysa boş mesaj göster
             const classesContainer = document.getElementById(`classes_${teacher}`);
             if (classesContainer.children.length === 0) {
-                classesContainer.innerHTML = '<div class="empty-message">Sınıf yok</div>';
+                classesContainer.innerHTML = '<div class="empty-message">Henüz sınıf atanmamış</div>';
             }
 
             // Firebase'e kaydet
@@ -661,13 +873,20 @@
                 // Tüm atamaları temizle
                 teachers.forEach(teacher => {
                     teacherAssignments[teacher] = [];
+                    pendingChanges[teacher] = [];
                     
                     // Sınıf containerını temizle
                     const classesContainer = document.getElementById(`classes_${teacher}`);
-                    classesContainer.innerHTML = '<div class="empty-message">Sınıf yok</div>';
+                    classesContainer.innerHTML = '<div class="empty-message">Henüz sınıf atanmamış</div>';
                     
                     // Toplam saati sıfırla
                     document.getElementById(`totalHours_${teacher}`).textContent = '0 saat';
+                    
+                    // Kaydet butonunu deaktif et
+                    const saveBtn = document.getElementById(`saveBtn_${teacher}`);
+                    const pendingIndicator = document.getElementById(`pendingChanges_${teacher}`);
+                    saveBtn.disabled = true;
+                    pendingIndicator.style.display = 'none';
                 });
                 
                 assignedClasses.clear();
